@@ -1,4 +1,5 @@
 mod utils;
+mod modules;
 mod workflow;
 mod cli;
 

@@ -2,6 +2,8 @@ use saphyr::{LoadableYamlNode, Yaml};
 use std::path::PathBuf;
 use std::fs;
 
+use crate::modules;
+
 
 fn parse_configuration(raw_config: &PathBuf) -> Yaml<'_> {
     let config_string = fs::read_to_string(raw_config)
@@ -17,7 +19,14 @@ pub fn apply_configuration(raw_config: &PathBuf) -> Result<(), String> {
     let config_wrapped = parse_configuration(&raw_config);
     let config = &config_wrapped[0];
 
-    let hyprland = &config["hyprland"];
+    for (key, value) in config.as_mapping().unwrap() {
+        let key_string = key.as_str().unwrap();
+
+        match key_string {
+            "hyprland" => modules::hyprland::apply_hyprland_config(&value),
+            _ => return Err(format!("{}: {}", "invalid command", key_string))
+        }
+    }
 
     Ok(())
 }
