@@ -1,8 +1,7 @@
-mod utils;
-mod modules;
-mod workflow;
 mod cli;
-
+mod modules;
+mod utils;
+mod workflow;
 
 fn main() {
     cli::run_cli();
