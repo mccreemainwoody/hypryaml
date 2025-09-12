@@ -20,9 +20,13 @@ pub fn apply_configuration(raw_config: &PathBuf) -> Result<(), String> {
     for (key, value) in config.as_mapping().unwrap() {
         let key_string = key.as_str().unwrap();
 
-        match key_string {
+        let application_result = match key_string {
             "hyprland" => modules::hyprland::apply_config(&value),
             _ => return Err(format!("{}: {}", "invalid command", key_string)),
+        };
+
+        if application_result.is_err() {
+            return application_result;
         }
     }
 
