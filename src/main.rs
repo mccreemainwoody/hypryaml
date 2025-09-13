@@ -1,3 +1,8 @@
+mod cli;
+mod modules;
+mod utils;
+mod workflow;
+
 fn main() {
-    println!("Hello, world!");
+    cli::run_cli();
 }
