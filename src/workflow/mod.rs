@@ -1,4 +1,4 @@
-use saphyr::{LoadableYamlNode, Yaml};
+use saphyr::{LoadableYamlNode, ScanError, Yaml};
 use std::fs;
 use std::path::PathBuf;
 
@@ -12,9 +12,11 @@ use crate::modules;
 ///
 /// # Return
 ///
-/// The resulting YAML object representation. See documentation about the
-/// [saphyr](https://github.com/saphyr-rs/saphyr) library for more information
-/// about this structure.
+/// A Result object. Ok contains he resulting YAML object representation while
+/// Error contains a YAML ScanError structure.
+///
+/// See documentation about the [saphyr](https://github.com/saphyr-rs/saphyr)
+/// library for more information about YAML representation structures.
 ///
 /// # Panic
 ///
@@ -22,13 +24,16 @@ use crate::modules;
 ///
 /// - The file is not accessible.
 /// - The file is not a valid YAML configuration.
-fn parse_configuration(raw_config: &PathBuf) -> Yaml<'_> {
+fn parse_configuration(raw_config: &PathBuf) -> Result<Yaml<'_>, ScanError> {
     let config_string =
         fs::read_to_string(raw_config).expect("failed to read file: ");
 
-    let config = Yaml::load_from_str(&config_string).unwrap();
+    let config = Yaml::load_from_str(&config_string);
 
-    Yaml::Sequence(config)
+    match config {
+        Ok(node) => Ok(Yaml::Sequence(node)),
+        Err(error) => Err(error),
+    }
 }
 
 /// Evaluate and apply the specified configuration.
@@ -49,8 +54,25 @@ fn parse_configuration(raw_config: &PathBuf) -> Yaml<'_> {
 /// A Result object. Ok contains nothing while Error contains the reason of
 /// the error stored as a String.
 pub fn apply_configuration(raw_config: &PathBuf) -> Result<(), String> {
-    let config_wrapped = parse_configuration(&raw_config);
+    let config_check = parse_configuration(&raw_config);
+
+    if config_check.is_err() {
+        let error = config_check.unwrap_err();
+        let error_message =
+            format!("failed to parse YAML: {}", error.to_string());
+
+        return Err(error_message);
+    }
+
+    let config_wrapped = config_check.unwrap();
+
     let config = &config_wrapped[0];
+
+    if !config.is_mapping() {
+        let error_message = format!("supposed YAML config is not a mapping");
+
+        return Err(error_message);
+    }
 
     for (key, value) in config.as_mapping().unwrap() {
         let key_string = key.as_str().unwrap();
