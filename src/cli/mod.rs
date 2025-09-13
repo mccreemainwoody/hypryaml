@@ -2,6 +2,7 @@ use clap::Parser;
 
 mod commands;
 
+/// clap command Parser definition
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 pub struct CLI {
@@ -9,6 +10,10 @@ pub struct CLI {
     command: commands::Commands,
 }
 
+/// Main callback of the CLI.
+///
+/// The right command is run depending of the user's input. Doesn't return
+/// anything, but will print an error if application fails.
 pub fn run_cli() {
     let cli = CLI::parse();
 
