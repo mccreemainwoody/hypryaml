@@ -1,4 +1,5 @@
 use clap::Parser;
+use std::process::exit;
 
 mod commands;
 
@@ -19,7 +20,15 @@ pub fn run_cli() {
 
     match &cli.command {
         commands::Commands::Apply { config } => {
-            commands::run_apply(&config).expect("Error during theme updating: ")
+            let result = commands::run_apply(&config);
+
+            match result {
+                Ok(_) => {}
+                Err(reason) => {
+                    println!("Error during theme updating:\n{}", reason);
+                    exit(1)
+                }
+            }
         }
     }
 }

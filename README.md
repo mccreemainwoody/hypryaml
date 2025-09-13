@@ -64,9 +64,6 @@ hyprland:
         border_size: 1
         col.inactive_border: rgb(ff0000) rgb(ffff00) 45rad
         col.active_border: rgb(33ccff) rgb(00ff99) 45rad
-    blur:
-        enabled: true
-        noise: 0.15
 ```
 
 *(In the case of Hyprland, each leaf node will be parsed as a configuration

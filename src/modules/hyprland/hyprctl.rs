@@ -1,7 +1,19 @@
-use std::io;
-use std::process::{Command, ExitStatus, Stdio};
+use std::process::{Command, Stdio};
 
 use crate::utils::Pair;
+
+/// Clean the text from unwanted characters.
+///
+/// For now, it just merges all backslashes into a same series as one.
+fn clean_text(string: &String) -> String {
+    let mut result = string.clone();
+
+    while result.find("\n\n").is_some() {
+        result = result.replace("\n\n", "\n");
+    }
+
+    result
+}
 
 /// Format the keyword pair to the string format used when calling hyprctl.
 ///
@@ -25,9 +37,6 @@ fn format_keyword_definition(keyword: &Pair<String, String>) -> String {
 /// This processed is done using the hyprctl CLI as a middleware between
 /// hypryaml and the Hyprland socket.
 ///
-/// This process is run as a batch : settings are applied together or fail
-/// together.
-///
 /// # Aguments
 ///
 /// * `keywords` - A list of pairs. Each pair must contain the keyword to
@@ -36,11 +45,11 @@ fn format_keyword_definition(keyword: &Pair<String, String>) -> String {
 ///
 /// # Return
 ///
-/// A Result object. Ok contains an ExitStatus structure, while Error contains
-/// the error specified as an io::Error object.
+/// A Result object. Ok contains nothing, while Error contains the error
+/// specified as a String.
 pub fn apply_keywords_to_config(
     keywords: Vec<Pair<String, String>>,
-) -> Result<ExitStatus, io::Error> {
+) -> Result<(), String> {
     let mut hyprctl = Command::new("hyprctl");
 
     let batch = keywords
@@ -51,10 +60,26 @@ pub fn apply_keywords_to_config(
 
     let capture_mode = Stdio::piped;
 
-    hyprctl
+    let result = hyprctl
         .arg("--batch")
         .arg(batch)
         .stdout(capture_mode())
         .stderr(capture_mode())
-        .status()
+        .output();
+
+    match result {
+        Ok(output) => {
+            let stdout = String::from_utf8(output.stdout)
+                .expect("failure during hyprctl stdout conversion: ");
+
+            if stdout != "ok" {
+                let cleaned_stdout = clean_text(&stdout);
+
+                Err(cleaned_stdout)
+            } else {
+                Ok(())
+            }
+        }
+        Err(error) => Err(error.to_string()),
+    }
 }
