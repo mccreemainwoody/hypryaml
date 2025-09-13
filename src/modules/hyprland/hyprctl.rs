@@ -72,10 +72,17 @@ pub fn apply_keywords_to_config(
             let stdout = String::from_utf8(output.stdout)
                 .expect("failure during hyprctl stdout conversion: ");
 
-            if stdout != "ok" {
-                let cleaned_stdout = clean_text(&stdout);
+            let cleaned_stdout = clean_text(&stdout);
 
-                Err(cleaned_stdout)
+            let good_line = "ok";
+            let erronous_lines: Vec<&str> = cleaned_stdout
+                .split("\n")
+                .into_iter()
+                .filter(|line| !line.is_empty() && line != &good_line)
+                .collect();
+
+            if erronous_lines.len() > 0 {
+                Err(erronous_lines.join("\n"))
             } else {
                 Ok(())
             }

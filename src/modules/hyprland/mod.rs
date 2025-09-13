@@ -41,7 +41,7 @@ mod keywords;
 ///     col.active_border: rgb(33ccff) rgb(00ff99) 45rad
 /// ```
 pub fn apply_config(config: &Yaml<'_>) -> Result<(), String> {
-    println!("applying hyprland config...");
+    println!("Applying hyprland config...");
 
     let mut keywords: Vec<Pair<String, String>> = vec![];
     let base_prefix = String::from("");

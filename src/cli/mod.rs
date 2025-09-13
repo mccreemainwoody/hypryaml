@@ -23,7 +23,7 @@ pub fn run_cli() {
             let result = commands::run_apply(&config);
 
             match result {
-                Ok(_) => {}
+                Ok(_) => println!("Configuration succesfully applied!"),
                 Err(reason) => {
                     println!("Error during theme updating:\n{}", reason);
                     exit(1)
