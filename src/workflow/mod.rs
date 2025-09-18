@@ -79,6 +79,7 @@ pub fn apply_configuration(raw_config: &PathBuf) -> Result<(), String> {
 
         let application_result = match key_string {
             "hyprland" => modules::hyprland::apply_config(&value),
+            "hyprpaper" => modules::hyprpaper::apply_config(&value),
             _ => return Err(format!("{}: {}", "invalid command", key_string)),
         };
 
