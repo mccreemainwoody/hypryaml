@@ -1,21 +1,8 @@
 use saphyr::{Sequence, Yaml};
 
-mod hyprctl;
+use crate::utils::error::throw_error;
 
-/// Utility function to create an Err object based on an static string
-/// smoothly.
-///
-/// # Arguments
-///
-/// * `message` - The message to return with the error as a static string (or
-///               any other type of string reference).
-///
-/// # Return
-///
-/// A new Err object containing the specified message as a String object.
-fn throw_error(message: &str) -> Result<(), String> {
-    Err(message.to_string())
-}
+mod hyprctl;
 
 /// Return whether all the YAML nodes of the Sequence are mappings.
 ///
@@ -60,7 +47,7 @@ fn validate_config_sequence(sequence: &Sequence) -> bool {
 /// `config["hyprpaper"]`) :
 ///
 /// ```ignore
-/// hyprland:
+/// hyprpaper:
 ///   - monitor: DPD-1
 ///     background: /home/me/amogus.jpg
 ///   - monitor: DPD-2
@@ -68,50 +55,44 @@ fn validate_config_sequence(sequence: &Sequence) -> bool {
 /// ```
 pub fn apply_config(config: &Yaml<'_>) -> Result<(), String> {
     if !config.is_sequence() {
-        return throw_error(
-            "hyprpaper configuration should be a suite of subnodes",
-        );
+        return throw_error("hyprpaper configuration should be a sequence");
     }
 
     let wallpapers = config.as_sequence().unwrap();
 
     if !validate_config_sequence(wallpapers) {
-        return throw_error("hyprpaper configuration should only be mapping");
+        return throw_error(
+            "hyprpaper configuration must be a sequence of mappings",
+        );
     }
 
     for section in wallpapers {
         let monitor_query = section.as_mapping_get("monitor");
-        let background_query = section.as_mapping_get("background");
+        let wallpaper_query = section.as_mapping_get("wallpaper");
 
         if monitor_query.is_none() {
             return throw_error("expected key monitor not found");
         }
 
-        if background_query.is_none() {
-            return throw_error("expected key background not found");
+        if wallpaper_query.is_none() {
+            return throw_error("expected key wallpaper not found");
         }
 
         let monitor = monitor_query.unwrap();
-        let background = background_query.unwrap();
+        let wallpaper = wallpaper_query.unwrap();
 
         if !monitor.is_string() {
             return throw_error("expected key monitor can only be a string");
         }
 
-        if !background.is_string() {
+        if !wallpaper.is_string() {
             return throw_error("expected key background can only be a string");
         }
 
-        let monitor_str = monitor.clone().into_string().unwrap();
-        let background_str = background.clone().into_string().unwrap();
+        let monitor_str = monitor.as_str().unwrap();
+        let background_str = wallpaper.as_str().unwrap();
 
-        let result = hyprctl::apply_wallpaper(&monitor_str, &background_str);
-
-        if result.is_err() {
-            let error = result.err().unwrap();
-
-            return Err(error);
-        }
+        hyprctl::apply_wallpaper(&monitor_str, &background_str)?
     }
 
     Ok(())
