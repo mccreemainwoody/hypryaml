@@ -1,6 +1,6 @@
 use saphyr::{Sequence, Yaml};
 
-use crate::utils::error::throw_error;
+use crate::utils::error::create_error;
 
 mod hyprctl;
 
@@ -55,13 +55,13 @@ fn validate_config_sequence(sequence: &Sequence) -> bool {
 /// ```
 pub fn apply_config(config: &Yaml<'_>) -> Result<(), String> {
     if !config.is_sequence() {
-        return throw_error("hyprpaper configuration should be a sequence");
+        return create_error("hyprpaper configuration should be a sequence");
     }
 
     let wallpapers = config.as_sequence().unwrap();
 
     if !validate_config_sequence(wallpapers) {
-        return throw_error(
+        return create_error(
             "hyprpaper configuration must be a sequence of mappings",
         );
     }
@@ -71,22 +71,24 @@ pub fn apply_config(config: &Yaml<'_>) -> Result<(), String> {
         let wallpaper_query = section.as_mapping_get("wallpaper");
 
         if monitor_query.is_none() {
-            return throw_error("expected key monitor not found");
+            return create_error("expected key monitor not found");
         }
 
         if wallpaper_query.is_none() {
-            return throw_error("expected key wallpaper not found");
+            return create_error("expected key wallpaper not found");
         }
 
         let monitor = monitor_query.unwrap();
         let wallpaper = wallpaper_query.unwrap();
 
         if !monitor.is_string() {
-            return throw_error("expected key monitor can only be a string");
+            return create_error("expected key monitor can only be a string");
         }
 
         if !wallpaper.is_string() {
-            return throw_error("expected key background can only be a string");
+            return create_error(
+                "expected key background can only be a string",
+            );
         }
 
         let monitor_str = monitor.as_str().unwrap();

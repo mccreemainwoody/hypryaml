@@ -9,6 +9,6 @@
 /// # Return
 ///
 /// A new Err object containing the specified message as a String object.
-pub fn throw_error(message: &str) -> Result<(), String> {
+pub fn create_error(message: &str) -> Result<(), String> {
     Err(message.to_string())
 }
