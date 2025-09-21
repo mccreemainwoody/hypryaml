@@ -29,7 +29,7 @@ fn append_keyword(current_namespace: &String, new_keyword: &str) -> String {
 /// Parse the YAML hyprland subnode and generate the keywords to update.
 ///
 /// As Hyprland uses section namespaces to organise all the different
-/// updatable values, keywords can be produced in a recursive fashion. As
+/// updatable values, keywords can be produced in a recursive fashion. As such,
 /// we choose to aggregate the keywords in a provided vector which is used to
 /// to store all the results in one final place.
 ///

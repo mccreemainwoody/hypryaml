@@ -30,7 +30,26 @@ This package may be used for, for example :
 
 ## Installation
 
-Build and install the package on your local machine using cargo :
+### From Cargo
+
+You can download hypryaml using Cargo :
+
+```{bash}
+cargo install hypryaml
+```
+
+Cargo will install the package from the crates.io repository. Don't forget to
+add its folder to your PATH if it isn't already so:
+
+```{bash}
+export PATH="~/.cargo/bin:$PATH"
+```
+
+You're then ready to use the package !
+
+### From source
+
+Build and install the package on your local machine using Cargo :
 
 ```{bash}
 cargo install --git ssh://git@github.com/mccreemainwoody/hypryaml.git
@@ -52,6 +71,8 @@ export PATH="~/.cargo/bin:$PATH"
 ```
 
 ## Usage
+
+### Hyprland
 
 First, create a configuration file. Using your favorite editor, open a new
 file and create a YAML node following the structure :
@@ -82,19 +103,46 @@ hypryaml apply my_config.yaml
 And voilà! Your configuration is automatically loaded into your current
 Hyprland environment instance.
 
+### Hyprpaper
+
+If you wish to apply a hyprpaper wallpaper using a YAML configuration, you can
+do so by specifying a list of wallpapers to apply *(you may add it next to your
+Hyprland configuration !)* :
+
+```{yaml}
+# my_config.yaml
+
+hyprpaper:
+    - monitor: DPD-1
+      wallpaper: ~/wallpapers/amogus.png
+    - monitor: DPD-2
+      wallpaper: ~/wallpapers/amogus.png
+    - monitor: * 
+      wallpaper: ~/wallpapers/amogus.png
+```
+
+If you use values normally extended by your terminal (~ token, environments
+variables...), hypryaml will extend them for you before passing it to hyprctl !
+
+You can also use the special value `*` to specify a wallpaper to apply to all
+monitors. **If you use this feature, it is recommanded you do not use a
+default hyprpaper.conf configuration file.** *(setting a wallpaper for a
+monitor will not affected any global wallpaper settings)*
+
 ## Improvements
 
-For now, the project is only in the state of a usable prototype: only Hyprland
-keywords are supported as of now *(which is still sufficient to start creating
+As the project is still in an early state: only Hyprland keywords and hyprpaper
+wallpapers are supported as of now *(which is still sufficient to start creating
 themes!)*. Planned or potential improvement may include :
 
-- Support for hyprpaper
+- x Support for hyprpaper
 - Support for hyprsunset
 - Support for static or file-based configurations (CRON task, convert a YAML
   configuration to a module file config)
 - Revert the last applied configuration and rollback on error
 - Permanently save configuration attributes
 - Improve Rust code quality and performance
+- Writing a small Wiki to explain how to use the CLI more clearly
 
 If you wish to contribute to the project, do not hesitate to open a pull
 request or even a feature or bug issue ! Specific improvements may take time to

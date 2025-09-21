@@ -1,10 +1,18 @@
 use std::process::{Command, Stdio};
 
-use crate::utils::Pair;
+use crate::utils::{system::extract_stdout, Pair};
 
 /// Clean the text from unwanted characters.
 ///
 /// For now, it just merges all backslashes into a same series as one.
+///
+/// # Parameters
+///
+/// * `string` - The string to clean.
+///
+/// # Return
+///
+/// A new String representing the cleansed value.
 fn clean_text(string: &String) -> String {
     let mut result = string.clone();
 
@@ -69,9 +77,7 @@ pub fn apply_keywords_to_config(
 
     match result {
         Ok(output) => {
-            let stdout = String::from_utf8(output.stdout)
-                .expect("failure during hyprctl stdout conversion: ");
-
+            let stdout = extract_stdout(&output)?;
             let cleaned_stdout = clean_text(&stdout);
 
             let good_line = "ok";
@@ -81,10 +87,9 @@ pub fn apply_keywords_to_config(
                 .filter(|line| !line.is_empty() && line != &good_line)
                 .collect();
 
-            if erronous_lines.len() > 0 {
-                Err(erronous_lines.join("\n"))
-            } else {
-                Ok(())
+            match erronous_lines.len() {
+                0 => Ok(()),
+                _ => Err(erronous_lines.join("\n")),
             }
         }
         Err(error) => Err(error.to_string()),
