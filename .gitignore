@@ -16,3 +16,6 @@ doc/
 
 # RustRover
 .idea/
+
+# Nix
+result*/
