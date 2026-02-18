@@ -93,6 +93,7 @@ NixOS configuration):
 ```nix
 {
     # ...
+    descriptiion = "";
 
     inputs = {
         nixpkgs.url = "nixpkgs/nixos-unstable";
@@ -102,6 +103,14 @@ NixOS configuration):
             inputs.nixpkgs.follows = "nixpkgs";
         };
     };
+
+    outputs = { nixpkgs, hypryaml, ... } @_ : let
+        system = "x86_64-linux";
+        hypryaml = hypryaml.packages.${system}.default;
+    in
+        {
+            # ...
+        };
 }
 ```
 
