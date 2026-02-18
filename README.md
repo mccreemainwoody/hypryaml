@@ -30,23 +30,6 @@ This package may be used for, for example :
 
 ## Installation
 
-### From Cargo
-
-You can download hypryaml using Cargo :
-
-```{bash}
-cargo install hypryaml
-```
-
-Cargo will install the package from the crates.io repository. Don't forget to
-add its folder to your PATH if it isn't already so:
-
-```{bash}
-export PATH="~/.cargo/bin:$PATH"
-```
-
-You're then ready to use the package !
-
 ### From source
 
 Build and install the package on your local machine using Cargo :
@@ -68,6 +51,67 @@ compiled binary !
 
 ```{bash}
 export PATH="~/.cargo/bin:$PATH"
+```
+
+### From Cargo
+
+You can download hypryaml using Cargo :
+
+```{bash}
+cargo install hypryaml
+```
+
+Cargo will install the package from the crates.io repository. Don't forget to
+add its folder to your PATH if it isn't already so:
+
+```{bash}
+export PATH="~/.cargo/bin:$PATH"
+```
+
+You're then ready to use the package !
+
+### From Nix
+
+You can also use hypryaml's dedicated Nix flake to integrate it in your Nix
+workflow.
+
+To run the CLI directly from its flake :
+
+```sh
+nix run github:mccreemainwoody/hypryaml -- --help
+```
+
+To run it inside a Nix shell :
+
+```sh
+nix shell github:mccreemainwoody/hypryaml
+```
+
+To integrate the flake inside another one (for another application or even your
+NixOS configuration):
+
+```nix
+{
+    # ...
+    descriptiion = "";
+
+    inputs = {
+        nixpkgs.url = "nixpkgs/nixos-unstable";
+
+        hypryaml = {
+            url = "github:mccreemainwoody/hypryaml";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
+    };
+
+    outputs = { nixpkgs, hypryaml, ... } @_ : let
+        system = "x86_64-linux";
+        hypryaml = hypryaml.packages.${system}.default;
+    in
+        {
+            # ...
+        };
+}
 ```
 
 ## Usage
