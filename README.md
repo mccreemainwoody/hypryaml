@@ -30,6 +30,35 @@ This package may be used for, for example :
 
 ## Installation
 
+### From Nix
+
+You can use hypryaml's dedicated Nix flake to integrate it in your Nix
+workflow.
+
+To run it inside a Nix shell :
+
+```sh
+nix shell github:mccreemainwoody/hypryaml
+```
+
+To integrate the flake inside another one (for another application or even your
+NixOS configuration):
+
+```nix
+{
+    # ...
+
+    inputs = {
+        nixpkgs.url = "nixpkgs/nixos-unstable";
+
+        hypryaml = {
+            url = "github:mccreemainwoody/hypryaml";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
+    };
+}
+```
+
 ### From Cargo
 
 You can download hypryaml using Cargo :
