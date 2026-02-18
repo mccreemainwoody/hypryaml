@@ -30,10 +30,56 @@ This package may be used for, for example :
 
 ## Installation
 
+### From source
+
+Build and install the package on your local machine using Cargo :
+
+```{bash}
+cargo install --git ssh://git@github.com/mccreemainwoody/hypryaml.git
+```
+
+If Cargo cannot fetch the repository on its own, you can also download the
+package by yourself and let cargo install it afterwards :
+
+```{bash}
+git clone git@github.com/mccreemainwoody/hypryaml.git
+cargo install --path hypryaml
+```
+
+Then, don't forget to add Cargo to your PATH to make sure you can access the
+compiled binary !
+
+```{bash}
+export PATH="~/.cargo/bin:$PATH"
+```
+
+### From Cargo
+
+You can download hypryaml using Cargo :
+
+```{bash}
+cargo install hypryaml
+```
+
+Cargo will install the package from the crates.io repository. Don't forget to
+add its folder to your PATH if it isn't already so:
+
+```{bash}
+export PATH="~/.cargo/bin:$PATH"
+```
+
+You're then ready to use the package !
+
 ### From Nix
 
-You can use hypryaml's dedicated Nix flake to integrate it in your Nix
+You can also use hypryaml's dedicated Nix flake to integrate it in your Nix
 workflow.
+
+To run the CLI directly from its flake :
+
+```sh
+nix run github:mccreemainwoody/hypryaml -- --help
+```
 
 To run it inside a Nix shell :
 
@@ -57,46 +103,6 @@ NixOS configuration):
         };
     };
 }
-```
-
-### From Cargo
-
-You can download hypryaml using Cargo :
-
-```{bash}
-cargo install hypryaml
-```
-
-Cargo will install the package from the crates.io repository. Don't forget to
-add its folder to your PATH if it isn't already so:
-
-```{bash}
-export PATH="~/.cargo/bin:$PATH"
-```
-
-You're then ready to use the package !
-
-### From source
-
-Build and install the package on your local machine using Cargo :
-
-```{bash}
-cargo install --git ssh://git@github.com/mccreemainwoody/hypryaml.git
-```
-
-If Cargo cannot fetch the repository on its own, you can also download the
-package by yourself and let cargo install it afterwards :
-
-```{bash}
-git clone git@github.com/mccreemainwoody/hypryaml.git
-cargo install --path hypryaml
-```
-
-Then, don't forget to add Cargo to your PATH to make sure you can access the
-compiled binary !
-
-```{bash}
-export PATH="~/.cargo/bin:$PATH"
 ```
 
 ## Usage
