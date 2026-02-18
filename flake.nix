@@ -4,7 +4,7 @@
     inputs = {
         systems.url = "systems";
 
-        nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+        nixpkgs.url = "nixpkgs/nixos-unstable";
         flake-utils = {
             url = "github:numtide/flake-utils";
             inputs.systems.follows = "systems";
@@ -21,7 +21,7 @@
                     hypryaml = pkgs.rustPlatform.buildRustPackage
                     {
                         pname = "hypryaml";
-                        version = "0.2.0";
+                        version = "0.2.1";
 
                         src = ./.; 
                         cargoLock = { lockFile = ./Cargo.lock; };

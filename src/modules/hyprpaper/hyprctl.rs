@@ -1,8 +1,7 @@
 use std::path::Path;
-use std::process::{Command, Stdio};
+use std::process::Command;
 
 use crate::utils::path;
-use crate::utils::system::extract_stdout;
 
 /// Load the wallpaper, running the corresponding call to `hyprpaper reload`.
 ///
@@ -21,28 +20,16 @@ use crate::utils::system::extract_stdout;
 /// specified as a String.
 fn load_wallpaper(monitor: &str, wallpaper: &Path) -> Result<(), String> {
     let mut hyprctl = Command::new("hyprctl");
-    let capture_mode = Stdio::piped;
 
     let formatted_input =
         format!("{},{}", monitor, wallpaper.to_str().unwrap());
 
     let result = hyprctl
-        .args(["hyprpaper", "reload", formatted_input.as_str()])
-        .stdout(capture_mode())
-        .stdout(capture_mode())
+        .args(["hyprpaper", "wallpaper", formatted_input.as_str()])
         .output();
 
     match result {
-        Ok(output) => {
-            let stdout = extract_stdout(&output)?;
-
-            let cleaned_stdout = stdout.trim();
-
-            match cleaned_stdout {
-                "ok" => Ok(()),
-                _ => Err(cleaned_stdout.to_string()),
-            }
-        }
+        Ok(_) => Ok(()),
         Err(error) => Err(error.to_string()),
     }
 }
