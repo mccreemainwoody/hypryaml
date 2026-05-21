@@ -9,6 +9,14 @@ mod commands;
 pub struct CLI {
     #[command(subcommand)]
     command: commands::Commands,
+
+    #[arg(
+        long,
+        short = 't',
+        help = "Duration in milliseconds for which notifications will be displayed",
+        default_value_t = 5000
+    )]
+    notification_timeout: u32,
 }
 
 /// Main callback of the CLI.
@@ -20,7 +28,8 @@ pub fn run_cli() {
 
     match &cli.command {
         commands::Commands::Apply { config } => {
-            let result = commands::run_apply(&config);
+            let result =
+                commands::run_apply(&config, &cli.notification_timeout);
 
             match result {
                 Ok(_) => println!("Configuration succesfully applied!"),

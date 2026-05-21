@@ -20,12 +20,16 @@ pub enum Commands {
 ///
 /// * `config` - A path to the configuration to apply. The path **must** be
 ///              valid.
+/// * `notification_timeout` - Duration for which to display the notification.
 ///
 /// # Return
 ///
 /// A Result object. Ok contains nothing, while Error will contain the reason
 /// of the error as a String.
-pub fn run_apply(config: &PathBuf) -> Result<(), String> {
+pub fn run_apply(
+    config: &PathBuf,
+    notification_timeout: &u32,
+) -> Result<(), String> {
     let result = validate_path(config)
         .and_then(|_| workflow::apply_configuration(&config));
 
@@ -33,9 +37,8 @@ pub fn run_apply(config: &PathBuf) -> Result<(), String> {
         Ok(_) => Ok("configuration succesfully applied"),
         Err(ref reason) => Err(reason.as_str()),
     };
-    let notify_timeout: u32 = 5000;
 
-    notify::send_notification(&notify_content, &notify_timeout);
+    notify::send_notification(&notify_content, notification_timeout);
 
     result
 }
