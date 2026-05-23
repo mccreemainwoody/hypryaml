@@ -15,8 +15,11 @@
     nixpkgs,
     flake-utils,
     ...
-  } @ _:
-    flake-utils.lib.eachDefaultSystem (
+  } @ _: let
+    globals = {
+      overlays.default = import ./nix/overlay.nix {};
+    };
+    systemSpecific = flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = import nixpkgs {inherit system;};
         hypryaml = pkgs.callPackage ./default.nix {};
@@ -29,4 +32,6 @@
         devShell = pkgs.callPackage ./shell.nix {};
       }
     );
+  in
+    globals // systemSpecific;
 }
