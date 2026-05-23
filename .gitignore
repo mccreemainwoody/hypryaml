@@ -18,4 +18,4 @@ doc/
 .idea/
 
 # Nix
-result*/
+result
