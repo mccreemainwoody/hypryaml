@@ -3,7 +3,6 @@
 
   inputs = {
     systems.url = "systems";
-
     nixpkgs.url = "nixpkgs/nixos-unstable";
     flake-utils = {
       url = "github:numtide/flake-utils";
@@ -20,25 +19,11 @@
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = import nixpkgs {inherit system;};
+        hypryaml = import ./default.nix pkgs;
       in {
         formatter = pkgs.alejandra;
         packages = rec {
-          hypryaml =
-            pkgs.rustPlatform.buildRustPackage
-            {
-              pname = "hypryaml";
-              version = "0.2.1";
-
-              src = ./.;
-              cargoLock = {lockFile = ./Cargo.lock;};
-
-              meta = {
-                description = "Dynamically set Hypr values using YAML !";
-                license = "MIT";
-                homepage = "https://github.com/mccreemainwoody/hypryaml";
-                systems = flake-utils.defaultSystems;
-              };
-            };
+          inherit hypryaml;
           default = hypryaml;
         };
         devShell = import ./shell.nix pkgs;
