@@ -19,7 +19,7 @@
   } @ _:
     flake-utils.lib.eachDefaultSystem (
       system: let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {inherit system;};
       in {
         formatter = pkgs.alejandra;
         packages = rec {
@@ -41,9 +41,7 @@
             };
           default = hypryaml;
         };
-        devShell = pkgs.mkShell {
-          packages = with pkgs; [rustc cargo rustfmt rust-analyzer libnotify];
-        };
+        devShell = import ./shell.nix pkgs;
       }
     );
 }
