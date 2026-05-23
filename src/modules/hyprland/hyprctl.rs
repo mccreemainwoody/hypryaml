@@ -86,7 +86,7 @@ fn get_hyprctl() -> Command {
 /// A Result object. Ok contains nothing, while Error contains the error
 /// specified as a String.
 pub fn apply_keywords_to_config(
-    keywords: Vec<Pair<String, String>>,
+    keywords: &Vec<Pair<String, String>>,
 ) -> Result<(), String> {
     let mut hyprctl = get_hyprctl();
 
