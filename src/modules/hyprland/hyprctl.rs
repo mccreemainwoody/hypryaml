@@ -1,5 +1,7 @@
 use std::process::{Command, Stdio};
 
+use regex::Regex;
+
 use crate::utils::{system::extract_stdout, Pair};
 
 /// Clean the text from unwanted characters.
@@ -38,6 +40,25 @@ fn clean_text(string: &String) -> String {
 /// value.
 fn format_keyword_definition(keyword: &Pair<String, String>) -> String {
     format!("keyword {} {}", keyword.first(), keyword.second())
+}
+
+/// Format all hexadecimal-like values so that all starts with `0x` as prefix.
+///
+/// Only hexadecimal values of 8 characters will be affected. Values which
+/// already have `0x` as prefix will not be changed.
+///
+/// # Arguments
+///
+/// * `string` - A reference to a string containing the text to procesed.
+///
+/// # Return
+///
+/// The formatted text as a new String object.
+fn format_hexadecimals(string: &str) -> String {
+    let pattern = Regex::new("(?<value>\\b[0-9a-fA-F]{8}\\b)").unwrap();
+    let clean_value = &pattern.replace_all(string, "0x$value");
+
+    clean_value.to_string()
 }
 
 /// Return a new command pointing to the `hyprctl` command.
@@ -143,7 +164,13 @@ pub fn get_option(keyword: &str) -> Result<String, String> {
                 );
             }
 
-            let value = first_line_split.last().unwrap();
+            let value_type = first_line_split.next().unwrap();
+            let value = first_line_split.next().unwrap();
+
+            if value_type == "custom type" {
+                let clean_value = format_hexadecimals(value);
+                return Ok(clean_value);
+            }
 
             Ok(value.to_string())
         }
