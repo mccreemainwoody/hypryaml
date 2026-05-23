@@ -19,14 +19,14 @@
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = import nixpkgs {inherit system;};
-        hypryaml = import ./default.nix pkgs;
+        hypryaml = pkgs.callPackage ./default.nix {};
       in {
         formatter = pkgs.alejandra;
         packages = rec {
           inherit hypryaml;
           default = hypryaml;
         };
-        devShell = import ./shell.nix pkgs;
+        devShell = pkgs.callPackage ./shell.nix {};
       }
     );
 }
