@@ -37,7 +37,7 @@
                 };
                 devShell = pkgs.mkShell {
                     packages = with pkgs;
-                        [ rustc cargo rustfmt rust-analyzer ];
+                        [ rustc cargo rustfmt rust-analyzer libnotify ];
                 };
             }
         );

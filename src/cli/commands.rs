@@ -1,6 +1,7 @@
 use clap::Subcommand;
 use std::path::PathBuf;
 
+use crate::modules::notify;
 use crate::utils::validate_path;
 use crate::workflow;
 
@@ -19,11 +20,25 @@ pub enum Commands {
 ///
 /// * `config` - A path to the configuration to apply. The path **must** be
 ///              valid.
+/// * `notification_timeout` - Duration for which to display the notification.
 ///
 /// # Return
 ///
 /// A Result object. Ok contains nothing, while Error will contain the reason
 /// of the error as a String.
-pub fn run_apply(config: &PathBuf) -> Result<(), String> {
-    validate_path(config).and_then(|_| workflow::apply_configuration(&config))
+pub fn run_apply(
+    config: &PathBuf,
+    notification_timeout: &u32,
+) -> Result<(), String> {
+    let result = validate_path(config)
+        .and_then(|_| workflow::apply_configuration(&config));
+
+    let notify_content = match result {
+        Ok(_) => Ok("configuration succesfully applied"),
+        Err(ref reason) => Err(reason.as_str()),
+    };
+
+    notify::send_notification(&notify_content, notification_timeout);
+
+    result
 }
