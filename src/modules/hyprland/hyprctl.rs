@@ -1,5 +1,7 @@
 use std::process::{Command, Stdio};
 
+use regex::Regex;
+
 use crate::utils::{system::extract_stdout, Pair};
 
 /// Clean the text from unwanted characters.
@@ -40,12 +42,40 @@ fn format_keyword_definition(keyword: &Pair<String, String>) -> String {
     format!("keyword {} {}", keyword.first(), keyword.second())
 }
 
+/// Format all hexadecimal-like values so that all starts with `0x` as prefix.
+///
+/// Only hexadecimal values of 8 characters will be affected. Values which
+/// already have `0x` as prefix will not be changed.
+///
+/// # Arguments
+///
+/// * `string` - A reference to a string containing the text to procesed.
+///
+/// # Return
+///
+/// The formatted text as a new String object.
+fn format_hexadecimals(string: &str) -> String {
+    let pattern = Regex::new("(?<value>\\b[0-9a-fA-F]{8}\\b)").unwrap();
+    let clean_value = &pattern.replace_all(string, "0x$value");
+
+    clean_value.to_string()
+}
+
+/// Return a new command pointing to the `hyprctl` command.
+///
+/// # Return
+///
+/// A Command object with the base command set to `hyprctl`.
+fn get_hyprctl() -> Command {
+    Command::new("hyprctl")
+}
+
 /// Apply the specified list of keyword to the current Hyprland instance.
 ///
 /// This processed is done using the hyprctl CLI as a middleware between
 /// hypryaml and the Hyprland socket.
 ///
-/// # Aguments
+/// # Arguments
 ///
 /// * `keywords` - A list of pairs. Each pair must contain the keyword to
 ///                update as their first value, and the value to set each
@@ -56,9 +86,9 @@ fn format_keyword_definition(keyword: &Pair<String, String>) -> String {
 /// A Result object. Ok contains nothing, while Error contains the error
 /// specified as a String.
 pub fn apply_keywords_to_config(
-    keywords: Vec<Pair<String, String>>,
+    keywords: &Vec<Pair<String, String>>,
 ) -> Result<(), String> {
-    let mut hyprctl = Command::new("hyprctl");
+    let mut hyprctl = get_hyprctl();
 
     let batch = keywords
         .iter()
@@ -93,5 +123,57 @@ pub fn apply_keywords_to_config(
             }
         }
         Err(error) => Err(error.to_string()),
+    }
+}
+
+/// Return the current value of an Hyprland option keyword.
+///
+/// This does a call to the `hyprctl getoption` keyword and returns the result.
+///
+/// # Parameters
+///
+/// * `keyword` - A reference to a string value containing the keyword to look
+///               for.
+///
+/// # Return
+///
+/// A Result object. It contains the value of the option keyword as a String
+/// object if the query was succesful, and the reason of the failure otherwise.
+pub fn get_option(keyword: &str) -> Result<String, String> {
+    let mut hyprctl = get_hyprctl();
+
+    let result = hyprctl
+        .arg("getoption")
+        .arg(keyword)
+        .stdout(Stdio::piped())
+        .output();
+
+    match result {
+        Ok(capture) => {
+            let stdout = extract_stdout(&capture)?;
+            let cleaned_stdout = clean_text(&stdout);
+
+            let mut full_content = cleaned_stdout.split("\n");
+            let first_line = full_content.next().unwrap_or_default();
+
+            let mut first_line_split = first_line.split(": ").peekable();
+
+            if first_line_split.peek().is_none() {
+                return Err(
+                    format!("keyword {} does not exist", keyword).to_string()
+                );
+            }
+
+            let value_type = first_line_split.next().unwrap();
+            let value = first_line_split.next().unwrap();
+
+            if value_type == "custom type" {
+                let clean_value = format_hexadecimals(value);
+                return Ok(clean_value);
+            }
+
+            Ok(value.to_string())
+        }
+        Err(reason) => Err(reason.to_string()),
     }
 }

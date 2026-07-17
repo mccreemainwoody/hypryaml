@@ -13,5 +13,6 @@ repository = "https://github.com/mccreemainwoody/hypryaml"
 
 [dependencies]
 clap = { version = "4.5.45", features = ["derive"] }
+regex = "1.12.3"
 saphyr = "0.0.6"
 shellexpand = "3.1.1"
